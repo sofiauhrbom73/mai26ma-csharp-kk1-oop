@@ -1,0 +1,40 @@
+Run results
+================
+Steps during the run:
+====================================
+     Initializing Students and Courses
+====================================
+Add student: Sofia was added to C#.
+Add student: Daniel was added to C#.
+Add student: Hadi was added to Python.
+Add student: Arne was added to Python.
+
+====================================
+        Education Management Menu
+====================================
+1. Add student to a course
+2. Remove student from a course
+3. Show roster for a course
+4. Show schedule for a student
+5. Show all courses and students
+6. Exit
+Choose an option: 
+Are you sure you want to quit? (Y/N): 
+Program finished.
+Final summary:
+Course overview:
+
+Course object summary: C# (2/2 seats filled)
+Course C# has students: Sofia, Daniel
+ToString output: C# (2/2 seats filled)
+Course object summary: Java (0/3 seats filled)
+Course Java has no students enrolled.
+Course object summary: Python (2/5 seats filled)
+Course Python has students: Hadi, Arne
+ToString output: Python (2/5 seats filled)
+
+
+Courses after the run:
+Course C# has students: Sofia, Daniel
+Course Java has no students enrolled.
+Course Python has students: Hadi, Arne
