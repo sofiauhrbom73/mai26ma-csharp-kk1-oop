@@ -10,6 +10,7 @@ Console.WriteLine("Hello, Education Project!");
 using StringWriter runLog = new();
 TextWriter originalOutput = Console.Out;
 Console.SetOut(new TeeWriter(originalOutput, runLog));
+DeletePreviousResultsFile();
 
 Course csharp = new("C#", 2);
 Course java = new("Java", 3);
@@ -205,21 +206,52 @@ void ExitProgram()
     Console.WriteLine("Program finished.");
     Console.WriteLine("Final summary:");
     ShowAllCoursesAndStudents();
-    SaveResultsFile();
-    Console.WriteLine("Results saved to results.txt.");
+    if (SaveResultsFile())
+    {
+        Console.WriteLine("Results saved to results.txt.");
+    }
+    else
+    {
+        Console.WriteLine("Results could not be saved to results.txt.");
+    }
     Console.WriteLine("Thank you for using the Education Program. Goodbye!");
 }
 
-void SaveResultsFile()
+void DeletePreviousResultsFile()
+{
+    try
+    {
+        if (File.Exists("results.txt"))
+        {
+            File.Delete("results.txt");
+        }
+    }
+    catch (IOException)
+    {
+    }
+    catch (UnauthorizedAccessException)
+    {
+    }
+}
+
+bool SaveResultsFile()
 {
     Console.SetOut(originalOutput);
 
-    if (File.Exists("results.txt"))
+    try
     {
-        File.Delete("results.txt");
+        DeletePreviousResultsFile();
+        FileHandler.SaveToFile("results.txt", runLog.ToString(), csharp, java, python);
+        return true;
     }
-
-    FileHandler.SaveToFile("results.txt", runLog.ToString(), csharp, java, python);
+    catch (IOException)
+    {
+        return false;
+    }
+    catch (UnauthorizedAccessException)
+    {
+        return false;
+    }
 }
 
 Student FindOrCreateStudent(string name)

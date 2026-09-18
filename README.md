@@ -4,6 +4,19 @@ Write a small system for courses and students that models their relationship in 
 
 This is a C# project *(created with `dotnet new console`; see the instructions in the course overview article from the first lesson).* Each class should be placed in its own file, and you should test them by creating objects and calling methods in **Program.cs**.
 
+## Getting Started
+
+Install the .NET 10 SDK, then clone and start the project:
+
+```bash
+git clone https://github.com/<your-username>/<your-repository>.git
+cd <your-repository>/EducationProject
+dotnet restore
+dotnet run
+```
+
+Use menu option **6. Exit** and confirm with `Y` or `Yes` to finish normally and create `results.txt`.
+
 You should have (at least) two classes:
 
 ## Course *(in Course.cs)*
@@ -48,7 +61,11 @@ Create several courses and several students. Enroll and remove them using both t
 
 ## Saving Results
 
-The program saves its results to `results.txt` when the user chooses **6. Exit** and confirms with `Y` or `Yes`.
+The program follows this normal-exit workflow:
+
+* When the program starts, an old `results.txt` is deleted.
+* When the user chooses **6. Exit** and confirms with `Y` or `Yes`, a new `results.txt` is created containing the run results.
+* When the user presses `Ctrl+C`, the program stops immediately. The file is not removed, and the current run is not saved.
 
 The file is recreated on each confirmed exit and contains:
 
