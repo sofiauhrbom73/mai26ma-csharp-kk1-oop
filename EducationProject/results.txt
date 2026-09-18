@@ -19,6 +19,18 @@ Add student: Arne was added to Python.
 5. Show all courses and students
 6. Exit
 Choose an option: 
+Enter student name: Enter course name (C#, Java, Python): Add student: C# is full. Lara could not be added.
+
+====================================
+        Education Management Menu
+====================================
+1. Add student to a course
+2. Remove student from a course
+3. Show roster for a course
+4. Show schedule for a student
+5. Show all courses and students
+6. Exit
+Choose an option: 
 Are you sure you want to quit? (Y/N): 
 Program finished.
 Final summary:
