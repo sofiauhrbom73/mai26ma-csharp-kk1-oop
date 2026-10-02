@@ -10,7 +10,6 @@ Console.WriteLine("Hello, Education Project!");
 using StringWriter runLog = new();
 TextWriter originalOutput = Console.Out;
 Console.SetOut(new TeeWriter(originalOutput, runLog));
-DeletePreviousResultsFile();
 
 Course csharp = new("C#", 2);
 Course java = new("Java", 3);
@@ -226,32 +225,12 @@ void FinishProgram()
     Console.WriteLine("Thank you for using the Education Program. Goodbye!");
 }
 
-void DeletePreviousResultsFile()
-{
-    try
-    {
-        if (File.Exists("results.txt"))
-        {
-            File.Delete("results.txt");
-        }
-    }
-    catch (IOException exception)
-    {
-        Console.WriteLine($"Warning: Could not delete the previous results.txt file. {exception.Message}");
-    }
-    catch (UnauthorizedAccessException exception)
-    {
-        Console.WriteLine($"Warning: Could not delete the previous results.txt file. {exception.Message}");
-    }
-}
-
 bool SaveResultsFile()
 {
     Console.SetOut(originalOutput);
 
     try
     {
-        DeletePreviousResultsFile();
         FileHandler.SaveToFile("results.txt", runLog.ToString(), csharp, java, python);
         return true;
     }
