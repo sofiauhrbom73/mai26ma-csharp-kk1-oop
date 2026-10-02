@@ -42,21 +42,20 @@ public class Student(string name)
         return course.Remove(this);
     }
 
+    public string Schedule()
+    {
+        if (courses.Count == 0)
+        {
+            return $"Schedule for {Name}:{Environment.NewLine}No courses enrolled.";
+        }
+
+        string courseNames = string.Join(
+            Environment.NewLine,
+            courses.Select(course => $"- {course}"));
+        return $"Schedule for {Name}:{Environment.NewLine}{courseNames}";
+    }
+
     // This method tells C# how to show the object as text.
     // It is called automatically by Console.WriteLine(student).
-    public override string ToString()
-    {
-        if (courses.Count == 1)
-        {
-            return Name + " (enrolled in 1 course)";
-        }
-        else if (courses.Count > 0)
-        {
-            return Name + " (enrolled in " + courses.Count + " courses)";
-        }
-        else
-        {
-            return Name + " (enrolled in no courses)";
-        }
-    }
+    public override string ToString() => Name;
 }

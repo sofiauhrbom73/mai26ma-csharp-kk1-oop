@@ -25,14 +25,22 @@ Student lara = new("Lara");
 List<Student> allStudents = [sofia, daniel, arne, hadi, lara];
 List<Course> allCourses = [csharp, java, python];
 
-// Seed some students so the menu has a working starting point.
+// Demonstrate the enrollment rules before the interactive menu starts.
 Console.WriteLine("====================================");
-Console.WriteLine("     Initializing Students and Courses");
+Console.WriteLine("     Enrollment Rule Demonstration");
 Console.WriteLine("====================================");
-EnrollAndReport("Add student", sofia, csharp);
-EnrollAndReport("Add student", daniel, csharp);
-EnrollAndReport("Add student", hadi, python);
-EnrollAndReport("Add student", arne, python);
+EnrollAndReport(sofia, csharp);
+EnrollAndReport(daniel, csharp);
+EnrollAndReport(sofia, csharp);
+EnrollAndReport(lara, csharp);
+RemoveAndReport(csharp, lara);
+EnrollAndReport(hadi, python);
+EnrollAndReport(arne, python);
+
+Console.WriteLine();
+Console.WriteLine(csharp.RollCall());
+Console.WriteLine(sofia.Schedule());
+Console.WriteLine($"Student summary: {sofia}");
 
 while (true)
 {
@@ -50,6 +58,13 @@ while (true)
 
     string? choice = Console.ReadLine();
     Console.WriteLine();
+
+    if (choice is null)
+    {
+        Console.WriteLine("Input ended. Exiting program.");
+        FinishProgram();
+        return;
+    }
 
     switch (choice)
     {
@@ -69,112 +84,93 @@ while (true)
             ShowAllCoursesAndStudents();
             break;
         case "6":
-            ExitProgram();
-            return;
+            if (ExitProgram())
+            {
+                return;
+            }
+            break;
         default:
-            Console.WriteLine("Invalid choice. Please select a number from 1 to 6.");
+            if (int.TryParse(choice, out _))
+            {
+                Console.WriteLine("Invalid choice. Please select a number from the list.");
+            }
+            else
+            {
+                Console.WriteLine("Please enter a number from the list.");
+            }
             break;
     }
 }
 
 void AddStudentToCourseMenu()
 {
-    Console.Write("Enter student name: ");
-    string? studentName = Console.ReadLine();
-    Console.Write("Enter course name (C#, Java, Python): ");
-    string? courseName = Console.ReadLine();
-
-    if (string.IsNullOrWhiteSpace(studentName) || string.IsNullOrWhiteSpace(courseName))
+    string? studentName = ReadRequiredInput("Enter student name: ", "Student name cannot be empty.");
+    if (studentName is null)
     {
-        Console.WriteLine("Student name and course name cannot be empty.");
+        return;
+    }
+
+    Course? course = FindCourseWithRetry();
+    if (course is null)
+    {
         return;
     }
 
     Student newStudent = FindOrCreateStudent(studentName);
-    Course? course = FindCourse(courseName);
-
-    if (course is null)
-    {
-        Console.WriteLine($"Course '{courseName}' does not exist.");
-        return;
-    }
-
-    EnrollAndReport("Add student", newStudent, course);
+    EnrollAndReport(newStudent, course);
 }
 
 void RemoveStudentFromCourseMenu()
 {
-    Console.Write("Enter student name: ");
-    string? studentName = Console.ReadLine();
-    Console.Write("Enter course name (C#, Java, Python): ");
-    string? courseName = Console.ReadLine();
-
-    if (string.IsNullOrWhiteSpace(studentName) || string.IsNullOrWhiteSpace(courseName))
-    {
-        Console.WriteLine("Student name and course name cannot be empty.");
-        return;
-    }
-
-    Course? course = FindCourse(courseName);
-    Student? student = FindStudent(studentName);
-
+    Course? course = FindCourseWithRetry();
     if (course is null)
     {
-        Console.WriteLine($"Course '{courseName}' does not exist.");
         return;
     }
+
+    string? studentName = ReadRequiredInput("Enter student name: ", "Student name cannot be empty.");
+    if (studentName is null)
+    {
+        return;
+    }
+
+    Student? student = FindStudentWithRetry(studentName);
 
     if (student is null)
     {
-        Console.WriteLine($"Student '{studentName}' does not exist.");
         return;
     }
 
-    RemoveAndReport("Remove student", course, student);
+    RemoveAndReport(course, student);
 }
 
 void ShowCourseRosterMenu()
 {
-    Console.Write("Enter course name (C#, Java, Python): ");
-    string? courseName = Console.ReadLine();
-
-    if (string.IsNullOrWhiteSpace(courseName))
-    {
-        Console.WriteLine("Course name cannot be empty.");
-        return;
-    }
-
-    Course? course = FindCourse(courseName);
-
+    Course? course = FindCourseWithRetry();
     if (course is null)
     {
-        Console.WriteLine($"Course '{courseName}' does not exist.");
         return;
     }
 
-    PrintCourseWithStudents(course);
+    Console.WriteLine(course.RollCall());
 }
 
 void ShowStudentScheduleMenu()
 {
-    Console.Write("Enter student name: ");
-    string? studentName = Console.ReadLine();
-
-    if (string.IsNullOrWhiteSpace(studentName))
+    string? studentName = ReadRequiredInput("Enter student name: ", "Student name cannot be empty.");
+    if (studentName is null)
     {
-        Console.WriteLine("Student name cannot be empty.");
         return;
     }
 
-    Student? student = FindStudent(studentName);
+    Student? student = FindStudentWithRetry(studentName);
 
     if (student is null)
     {
-        Console.WriteLine($"Student '{studentName}' does not exist.");
         return;
     }
 
-    PrintSchedule(student);
+    Console.WriteLine(student.Schedule());
 }
 
 void ShowAllCoursesAndStudents()
@@ -186,22 +182,35 @@ void ShowAllCoursesAndStudents()
     {
         // The ToString() method is used automatically when we print the object.
         Console.WriteLine($"Course object summary: {course}");
-        PrintCourseWithStudents(course);
+        Console.WriteLine(course.RollCall());
     }
 }
 
-void ExitProgram()
+bool ExitProgram()
 {
     Console.Write("Are you sure you want to quit? (Y/N): ");
     string? answer = Console.ReadLine();
+
+    if (answer is null)
+    {
+        Console.WriteLine("Input ended. Exiting program.");
+        FinishProgram();
+        return true;
+    }
 
     if (!string.Equals(answer, "Y", StringComparison.OrdinalIgnoreCase) &&
         !string.Equals(answer, "Yes", StringComparison.OrdinalIgnoreCase))
     {
         Console.WriteLine("Exit cancelled.");
-        return;
+        return false;
     }
 
+    FinishProgram();
+    return true;
+}
+
+void FinishProgram()
+{
     Console.WriteLine();
     Console.WriteLine("Program finished.");
     Console.WriteLine("Final summary:");
@@ -226,11 +235,13 @@ void DeletePreviousResultsFile()
             File.Delete("results.txt");
         }
     }
-    catch (IOException)
+    catch (IOException exception)
     {
+        Console.WriteLine($"Warning: Could not delete the previous results.txt file. {exception.Message}");
     }
-    catch (UnauthorizedAccessException)
+    catch (UnauthorizedAccessException exception)
     {
+        Console.WriteLine($"Warning: Could not delete the previous results.txt file. {exception.Message}");
     }
 }
 
@@ -244,12 +255,14 @@ bool SaveResultsFile()
         FileHandler.SaveToFile("results.txt", runLog.ToString(), csharp, java, python);
         return true;
     }
-    catch (IOException)
+    catch (IOException exception)
     {
+        Console.WriteLine($"Warning: Could not save results.txt. {exception.Message}");
         return false;
     }
-    catch (UnauthorizedAccessException)
+    catch (UnauthorizedAccessException exception)
     {
+        Console.WriteLine($"Warning: Could not save results.txt. {exception.Message}");
         return false;
     }
 }
@@ -280,6 +293,91 @@ Student? FindStudent(string name)
     return null;
 }
 
+Student? FindStudentWithRetry(string name)
+{
+    while (true)
+    {
+        Student? student = FindStudent(name);
+        if (student is not null)
+        {
+            return student;
+        }
+
+        Console.WriteLine($"Student '{name}' does not exist.");
+        if (!AskToRetry())
+        {
+            return null;
+        }
+
+        string? nextName = ReadRequiredInput("Enter student name: ", "Student name cannot be empty.");
+        if (nextName is null)
+        {
+            return null;
+        }
+
+        name = nextName;
+    }
+}
+
+Course? FindCourseWithRetry()
+{
+    string? name = ReadRequiredInput("Enter course name (C#, Java, Python): ", "Course name cannot be empty.");
+    if (name is null)
+    {
+        return null;
+    }
+
+    while (true)
+    {
+        Course? course = FindCourse(name);
+        if (course is not null)
+        {
+            return course;
+        }
+
+        Console.WriteLine($"Course '{name}' does not exist.");
+        if (!AskToRetry())
+        {
+            return null;
+        }
+
+        string? nextName = ReadRequiredInput("Enter course name (C#, Java, Python): ", "Course name cannot be empty.");
+        if (nextName is null)
+        {
+            return null;
+        }
+
+        name = nextName;
+    }
+}
+
+string? ReadRequiredInput(string prompt, string errorMessage)
+{
+    while (true)
+    {
+        Console.Write(prompt);
+        string? input = Console.ReadLine();
+        if (!string.IsNullOrWhiteSpace(input))
+        {
+            return input.Trim();
+        }
+
+        Console.WriteLine(errorMessage);
+        if (!AskToRetry())
+        {
+            return null;
+        }
+    }
+}
+
+bool AskToRetry()
+{
+    Console.Write("Would you like to try again? (Y/N): ");
+    string? answer = Console.ReadLine();
+    return string.Equals(answer, "Y", StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(answer, "Yes", StringComparison.OrdinalIgnoreCase);
+}
+
 Course? FindCourse(string name)
 {
     foreach (Course course in allCourses)
@@ -293,66 +391,16 @@ Course? FindCourse(string name)
     return null;
 }
 
-void EnrollAndReport(string action, Student student, Course course)
+void EnrollAndReport(Student student, Course course)
 {
     EnrollmentResult result = student.Join(course);
-
-    switch (result)
-    {
-        case EnrollmentResult.Enrolled:
-            Console.WriteLine($"{action}: {student.Name} was added to {course.Name}.");
-            break;
-        case EnrollmentResult.AlreadyEnrolled:
-            Console.WriteLine($"{action}: {student.Name} is already enrolled in {course.Name}.");
-            break;
-        case EnrollmentResult.CourseFull:
-            Console.WriteLine($"{action}: {course.Name} is full. {student.Name} could not be added.");
-            break;
-    }
+    Console.WriteLine(course.EnrollmentMessage(student, result));
 }
 
-void RemoveAndReport(string action, Course course, Student student)
+void RemoveAndReport(Course course, Student student)
 {
-    if (course.Remove(student))
-    {
-        Console.WriteLine($"{action}: {student.Name} was removed from {course.Name}.");
-    }
-    else
-    {
-        Console.WriteLine($"{action}: {student.Name} is not enrolled in {course.Name}.");
-    }
-}
-
-void PrintCourseWithStudents(Course course)
-{
-    if (course.Students.Count == 0)
-    {
-        Console.WriteLine($"Course {course.Name} has no students enrolled.");
-        return;
-    }
-
-    string students = string.Join(", ", course.Students.Select(student => student.Name));
-    Console.WriteLine($"Course {course.Name} has students: {students}");
-    // This shows how ToString() is called automatically when an object is interpolated.
-    Console.WriteLine($"ToString output: {course}");
-}
-
-void PrintSchedule(Student student)
-{
-    Console.WriteLine($"\nSchedule for {student.Name}:");
-    // When a Student is printed, C# calls ToString() automatically.
-    Console.WriteLine($"Student summary: {student}");
-
-    if (student.Courses.Count == 0)
-    {
-        Console.WriteLine("No courses enrolled.");
-        return;
-    }
-
-    foreach (Course course in student.Courses)
-    {
-        Console.WriteLine($"- {course}");
-    }
+    bool removed = course.Remove(student);
+    Console.WriteLine(course.RemovalMessage(student, removed));
 }
 
 internal sealed class TeeWriter(TextWriter first, TextWriter second) : TextWriter
@@ -408,19 +456,4 @@ internal class FileHandler
         writer.WriteLine($"Course {course.Name} has students: {students}");
     }
 
-    private static void WriteSchedule(StreamWriter writer, Student student)
-    {
-        writer.WriteLine($"Schedule for {student.Name}:");
-
-        if (student.Courses.Count == 0)
-        {
-            writer.WriteLine("No courses enrolled.");
-            return;
-        }
-
-        foreach (Course course in student.Courses)
-        {
-            writer.WriteLine($"- {course.Name}");
-        }
-    }
 }

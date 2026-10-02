@@ -64,6 +64,37 @@ public class Course(string name, int maxSeats)
         return false;
     }
 
+    public string RollCall()
+    {
+        if (students.Count == 0)
+        {
+            return $"Roll call for {Name}:{Environment.NewLine}No students enrolled.";
+        }
+
+        string studentNames = string.Join(
+            Environment.NewLine,
+            students.Select(student => $"- {student.Name}"));
+        return $"Roll call for {Name}:{Environment.NewLine}{studentNames}";
+    }
+
+    public string EnrollmentMessage(Student student, EnrollmentResult result)
+    {
+        return result switch
+        {
+            EnrollmentResult.Enrolled => $"Add student: {student.Name} was added to {Name}.",
+            EnrollmentResult.AlreadyEnrolled => $"Add student: {student.Name} is already enrolled in {Name}.",
+            EnrollmentResult.CourseFull => $"Add student: {Name} is full. {student.Name} could not be added.",
+            _ => throw new ArgumentOutOfRangeException(nameof(result), result, "Unknown enrollment result.")
+        };
+    }
+
+    public string RemovalMessage(Student student, bool removed)
+    {
+        return removed
+            ? $"Remove student: {student.Name} was removed from {Name}."
+            : $"Remove student: {student.Name} is not enrolled in {Name}.";
+    }
+
     // This method tells C# how to show the object as text.
     // It is called automatically by Console.WriteLine(course).
     public override string ToString()
