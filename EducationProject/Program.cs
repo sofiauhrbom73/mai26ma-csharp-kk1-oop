@@ -37,8 +37,8 @@ EnrollAndReport(hadi, python);
 EnrollAndReport(arne, python);
 
 Console.WriteLine();
-Console.WriteLine(csharp.RollCall());
-Console.WriteLine(sofia.Schedule());
+csharp.RollCall();
+sofia.Schedule();
 Console.WriteLine($"Student summary: {sofia}");
 
 while (true)
@@ -151,7 +151,7 @@ void ShowCourseRosterMenu()
         return;
     }
 
-    Console.WriteLine(course.RollCall());
+    course.RollCall();
 }
 
 void ShowStudentScheduleMenu()
@@ -169,7 +169,7 @@ void ShowStudentScheduleMenu()
         return;
     }
 
-    Console.WriteLine(student.Schedule());
+    student.Schedule();
 }
 
 void ShowAllCoursesAndStudents()
@@ -181,7 +181,7 @@ void ShowAllCoursesAndStudents()
     {
         // The ToString() method is used automatically when we print the object.
         Console.WriteLine($"Course object summary: {course}");
-        Console.WriteLine(course.RollCall());
+        course.RollCall();
     }
 }
 

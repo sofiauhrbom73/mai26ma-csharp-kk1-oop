@@ -64,17 +64,20 @@ public class Course(string name, int maxSeats)
         return false;
     }
 
-    public string RollCall()
+    public void RollCall()
     {
+        Console.WriteLine($"Roll call for {Name}:");
+
         if (students.Count == 0)
         {
-            return $"Roll call for {Name}:{Environment.NewLine}No students enrolled.";
+            Console.WriteLine("No students enrolled.");
+            return;
         }
 
-        string studentNames = string.Join(
-            Environment.NewLine,
-            students.Select(student => $"- {student.Name}"));
-        return $"Roll call for {Name}:{Environment.NewLine}{studentNames}";
+        foreach (Student student in students)
+        {
+            Console.WriteLine($"- {student.Name}");
+        }
     }
 
     public string EnrollmentMessage(Student student, EnrollmentResult result)

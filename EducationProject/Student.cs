@@ -42,17 +42,20 @@ public class Student(string name)
         return course.Remove(this);
     }
 
-    public string Schedule()
+    public void Schedule()
     {
+        Console.WriteLine($"Schedule for {Name}:");
+
         if (courses.Count == 0)
         {
-            return $"Schedule for {Name}:{Environment.NewLine}No courses enrolled.";
+            Console.WriteLine("No courses enrolled.");
+            return;
         }
 
-        string courseNames = string.Join(
-            Environment.NewLine,
-            courses.Select(course => $"- {course}"));
-        return $"Schedule for {Name}:{Environment.NewLine}{courseNames}";
+        foreach (Course course in courses)
+        {
+            Console.WriteLine($"- {course}");
+        }
     }
 
     // This method tells C# how to show the object as text.
